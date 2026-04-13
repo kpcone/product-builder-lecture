@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>강아지 vs 고양이 AI 분류기</title>
+  <style>
+    :root {
+      --bg: #0b1020; --panel: #111a33; --panel2: #0f1730;
+      --text: #e9eefc; --muted: #b7c2e6;
+      --brand: #6aa7ff; --brand2: #7cffc1;
+      --border: rgba(255,255,255,.10);
+      --radius: 20px;
+    }
+    body.light-mode {
+      --bg: #f8fafc; --panel: #ffffff; --panel2: #f1f5f9;
+      --text: #0f172a; --muted: #475569;
+      --border: rgba(0,0,0,.08);
+    }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg); color: var(--text);
+      display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+    header {
+      width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center;
+      box-sizing: border-box; border-bottom: 1px solid var(--border);
+    }
+    .container {
+      max-width: 600px; width: 90%; margin: 40px auto; text-align: center;
+    }
+    .card {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    h1 { margin-top: 0; font-size: 28px; }
+    p { color: var(--muted); line-height: 1.6; }
+    
+    #webcam-container, #image-preview {
+      margin: 20px auto; border-radius: 12px; overflow: hidden;
+      width: 300px; height: 300px; background: var(--panel2);
+      display: flex; align-items: center; justify-content: center;
+      border: 2px dashed var(--border);
+    }
+    canvas, img { width: 100%; height: 100%; object-fit: cover; }
+
+    .controls { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+    .btn {
+      padding: 12px 20px; border-radius: 12px; border: none; cursor: pointer;
+      font-weight: bold; transition: 0.2s; background: var(--panel2); color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--brand), #4b7cff); color: white; border: none;
+    }
+    
+    #label-container {
+      margin-top: 25px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .result-bar {
+      display: flex; align-items: center; gap: 10px; text-align: left;
+    }
+    .bar-bg {
+      flex: 1; height: 12px; background: var(--panel2); border-radius: 6px; overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; width: 0%; background: var(--brand); transition: width 0.3s ease;
+    }
+    .label-text { width: 80px; font-weight: bold; font-size: 14px; }
+    .percent-text { width: 45px; font-size: 14px; color: var(--muted); }
+
+    #themeToggle {
+      background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+      padding: 8px 12px; border-radius: 999px; cursor: pointer;
+    }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="font-weight: 800; font-size: 20px;">AI Classifier</div>
+    <button id="themeToggle">🌙</button>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h1>강아지 vs 고양이 분류</h1>
+      <p>카메라를 켜거나 이미지를 업로드하여<br/>AI가 강아지인지 고양이인지 분석합니다.</p>
+      
+      <div id="display-area">
+        <div id="webcam-container">
+          <span style="color:var(--muted)">카메라 대기 중...</span>
+        </div>
+        <div id="image-preview" style="display: none;"></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn primary" onclick="startWebcam()">카메라 시작</button>
+        <button class="btn" onclick="document.getElementById('file-input').click()">이미지 업로드</button>
+        <input type="file" id="file-input" accept="image/*" onchange="handleImageUpload(event)">
+      </div>
+
+      <div id="label-container"></div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <script>
+    const URL = "https://teachablemachine.withgoogle.com/models/M96EK8csD/";
+    let model, webcam, labelContainer, maxPredictions;
+    let isWebcamMode = false;
+
+    // Load the model
+    async function init() {
+      const modelURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+      model = await tmImage.load(modelURL, metadataURL);
+      maxPredictions = model.getTotalClasses();
+
+      labelContainer = document.getElementById("label-container");
+      for (let i = 0; i < maxPredictions; i++) {
+        const div = document.createElement("div");
+        div.className = "result-bar";
+        div.innerHTML = `
+          <span class="label-text"></span>
+          <div class="bar-bg"><div class="bar-fill"></div></div>
+          <span class="percent-text">0%</span>
+        `;
+        labelContainer.appendChild(div);
+      }
+    }
+
+    async function startWebcam() {
+      isWebcamMode = true;
+      document.getElementById("webcam-container").style.display = "flex";
+      document.getElementById("image-preview").style.display = "none";
+      
+      const flip = true; 
+      webcam = new tmImage.Webcam(300, 300, flip);
+      await webcam.setup();
+      await webcam.play();
+      window.requestAnimationFrame(loop);
+
+      document.getElementById("webcam-container").innerHTML = "";
+      document.getElementById("webcam-container").appendChild(webcam.canvas);
+    }
+
+    async function loop() {
+      if (!isWebcamMode) return;
+      webcam.update();
+      await predict(webcam.canvas);
+      window.requestAnimationFrame(loop);
+    }
+
+    async function predict(inputElement) {
+      const prediction = await model.predict(inputElement);
+      for (let i = 0; i < maxPredictions; i++) {
+        const classPrediction = prediction[i].className;
+        const probability = prediction[i].probability.toFixed(2);
+        
+        const row = labelContainer.childNodes[i];
+        row.querySelector(".label-text").innerText = classPrediction;
+        row.querySelector(".bar-fill").style.width = (probability * 100) + "%";
+        row.querySelector(".percent-text").innerText = Math.round(probability * 100) + "%";
+      }
+    }
+
+    async function handleImageUpload(event) {
+      isWebcamMode = false;
+      if (webcam) {
+        await webcam.stop();
+      }
+      
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = async function() {
+          const preview = document.getElementById("image-preview");
+          preview.innerHTML = "";
+          preview.appendChild(img);
+          preview.style.display = "flex";
+          document.getElementById("webcam-container").style.display = "none";
+          await predict(img);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Theme Toggle
+    const themeBtn = document.getElementById("themeToggle");
+    themeBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
+      themeBtn.textContent = document.body.classList.contains("light-mode") ? "☀️" : "🌙";
+    });
+
+    init();
+  </script>
+</body>
+</html>
