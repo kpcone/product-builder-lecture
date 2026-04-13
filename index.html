@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PC STORE | 컴퓨터 판매</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#111a33; --panel2:#0f1730;
+      --text:#e9eefc; --muted:#b7c2e6;
+      --brand:#6aa7ff; --brand2:#7cffc1; --danger:#ff6b6b;
+      --border: rgba(255,255,255,.10);
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius: 16px;
+      --max: 1120px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(106,167,255,.25), transparent 50%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(124,255,193,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{ color:inherit; text-decoration:none; }
+    .container{ max-width:var(--max); margin:0 auto; padding: 24px; }
+    header{
+      position: sticky; top:0; z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(11,16,32,.85), rgba(11,16,32,.55));
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar{ display:flex; gap:16px; align-items:center; justify-content:space-between; padding: 14px 24px; max-width:var(--max); margin:0 auto; }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; }
+    .logo{
+      width:36px; height:36px; border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 10px 25px rgba(106,167,255,.25);
+    }
+    .nav{ display:flex; gap:14px; align-items:center; color:var(--muted); font-weight:600; }
+    .nav a{ padding:8px 10px; border-radius:10px; }
+    .nav a:hover{ background: rgba(255,255,255,.06); color:var(--text); }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 12px; border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .pill strong{ color: var(--text); }
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-top: 18px;
+      align-items: stretch;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(17,26,51,.85), rgba(15,23,48,.85));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero .left{ padding: 22px; }
+    .hero h1{ margin: 0 0 10px; font-size: 34px; line-height: 1.15; }
+    .hero p{ margin: 0 0 18px; color: var(--muted); }
+    .hero .cta{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn{
+      border:0; cursor:pointer; font-weight:800;
+      padding: 12px 14px; border-radius: 14px;
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn:hover{ background: rgba(255,255,255,.12); }
+    .btn.primary{
+      background: linear-gradient(135deg, var(--brand), #4b7cff);
+      border-color: rgba(106,167,255,.35);
+    }
+    .btn.primary:hover{ filter: brightness(1.05); }
+    .btn.danger{
+      background: rgba(255,107,107,.12);
+      border-color: rgba(255,107,107,.28);
+      color: #ffd6d6;
+    }
+
+    .hero .right{ padding: 18px; display:flex; flex-direction:column; gap:12px; }
+    .stat{
+      display:flex; justify-content:space-between; align-items:center;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+    }
+    .stat strong{ color: var(--text); font-size: 18px; }
+    .section-title{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap: 14px;
+      margin: 28px 0 14px;
+    }
+    .section-title h2{ margin:0; font-size: 20px; }
+    .filters{
+      display:flex; gap:10px; flex-wrap:wrap;
+      color: var(--muted);
+    }
+    .input, select{
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      outline: none;
+    }
+    .input::placeholder{ color: rgba(233,238,252,.45); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+    .product{
+      grid-column: span 4;
+      padding: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .thumb{
+      height: 150px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background:
+        radial-gradient(420px 180px at 40% 20%, rgba(106,167,255,.28), transparent 55%),
+        radial-gradient(360px 200px at 70% 80%, rgba(124,255,193,.18), transparent 55%),
+        rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content:center;
+      font-weight:900; letter-spacing:.6px;
+      color: rgba(233,238,252,.85);
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding: 6px 10px; border-radius: 999px;
+      background: rgba(124,255,193,.12);
+      border: 1px solid rgba(124,255,193,.24);
+      color: #caffea;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .pname{ font-size: 16px; font-weight: 900; margin: 0; }
+    .spec{ margin:0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .price{ font-weight: 1000; font-size: 18px; }
+    .sub{ font-size: 12px; color: var(--muted); }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap: 14px;
+      align-items:start;
+      margin-top: 10px;
+    }
+    aside{
+      position: sticky;
+      top: 86px;
+    }
+    .cart{
+      padding: 14px;
+    }
+    .cart h3{ margin: 0 0 8px; }
+    .cartlist{ display:flex; flex-direction:column; gap:10px; margin-top: 10px; }
+    .item{
+      display:flex; gap:10px; align-items:flex-start;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+    }
+    .mini{
+      width: 44px; height: 44px; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 900; color: rgba(233,238,252,.75);
+      flex: 0 0 auto;
+    }
+    .item .meta{ flex:1; }
+    .item .meta .t{ font-weight:900; font-size: 13px; margin: 0 0 2px; }
+    .item .meta .d{ margin:0; color: var(--muted); font-size: 12px; }
+    .qty{
+      display:flex; align-items:center; gap:6px;
+      margin-top: 8px;
+    }
+    .qty button{
+      width: 30px; height: 30px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+      font-weight: 900;
+    }
+    .qty span{ min-width: 18px; text-align:center; font-weight: 900; }
+
+    .summary{
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(255,255,255,.18);
+      color: var(--muted);
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+    .summary .line{ display:flex; justify-content:space-between; align-items:center; }
+    .summary .total{ color: var(--text); font-weight: 1000; font-size: 18px; }
+    .coupon{
+      display:flex; gap:8px;
+      margin-top: 10px;
+    }
+    .coupon input{ flex:1; }
+    .form{
+      margin-top: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .form .two{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    footer{
+      color: rgba(233,238,252,.55);
+      padding: 30px 0 60px;
+      text-align:center;
+    }
+
+    @media (max-width: 980px){
+      .hero{ grid-template-columns: 1fr; }
+      .layout{ grid-template-columns: 1fr; }
+      aside{ position: static; }
+      .product{ grid-column: span 6; }
+    }
+    @media (max-width: 640px){
+      .product{ grid-column: span 12; }
+      .form .two{ grid-template-columns: 1fr; }
+      .hero h1{ font-size: 28px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div style="font-size:14px; opacity:.9;">PC STORE</div>
+          <div style="font-size:12px; color:var(--muted); font-weight:700;">컴퓨터 & 부품</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#products">상품</a>
+        <a href="#cart">장바구니</a>
+        <a href="#checkout">주문</a>
+      </nav>
+      <div class="pill" title="장바구니">
+        담은 상품 <strong id="cartCount">0</strong>개
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="card left">
+        <div class="pill" style="width:max-content; margin-bottom:10px;">
+          <span>오늘의 혜택</span> <strong>쿠폰 WELCOME10 (10% 할인)</strong>
+        </div>
+        <h1>원하는 성능대로, 빠르게 구매하는<br/>컴퓨터 판매 사이트(데모)</h1>
+        <p>
+          아래 제품은 예시 데이터입니다. “장바구니 담기”로 담고, 오른쪽에서 수량/쿠폰/주문 정보를 입력해보세요.
+        </p>
+        <div class="cta">
+          <button class="btn primary" onclick="document.querySelector('#products').scrollIntoView({behavior:'smooth'})">상품 보러가기</button>
+          <button class="btn" onclick="seedCart()">추천 구성 담기</button>
+          <button class="btn danger" onclick="clearCart()">장바구니 비우기</button>
+        </div>
+      </div>
+      <div class="card right">
+        <div class="stat"><span>배송</span><strong>당일/익일 출고</strong></div>
+        <div class="stat"><span>보증</span><strong>1년 무상</strong></div>
+        <div class="stat"><span>결제</span><strong>카드/계좌(데모)</strong></div>
+        <div class="stat"><span>문의</span><strong>support@pcstore.demo</strong></div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section>
+        <div class="section-title" id="products">
+          <h2>상품 목록</h2>
+          <div class="filters">
+            <input class="input" id="q" placeholder="검색: 예) 게이밍, 사무용, RTX" />
+            <select id="cat">
+              <option value="all">전체</option>
+              <option value="desktop">데스크탑</option>
+              <option value="laptop">노트북</option>
+              <option value="parts">부품</option>
+            </select>
+            <select id="sort">
+              <option value="reco">추천순</option>
+              <option value="low">가격 낮은순</option>
+              <option value="high">가격 높은순</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid" id="grid"></div>
+      </section>
+
+      <aside class="card cart" id="cart">
+        <h3>장바구니</h3>
+        <div class="sub">※ 데모: 실제 결제/재고 연동 없음</div>
+
+        <div class="coupon">
+          <input class="input" id="coupon" placeholder="쿠폰 코드 입력 (예: WELCOME10)" />
+          <button class="btn" onclick="applyCoupon()">적용</button>
+        </div>
+        <div class="sub" id="couponMsg" style="margin-top:8px;"></div>
+
+        <div class="cartlist" id="cartList"></div>
+
+        <div class="summary">
+          <div class="line"><span>상품금액</span><strong id="sumSubtotal">0원</strong></div>
+          <div class="line"><span>할인</span><strong id="sumDiscount">-0원</strong></div>
+          <div class="line"><span>배송비</span><strong id="sumShipping">0원</strong></div>
+          <div class="line total"><span>총 결제</span><strong id="sumTotal">0원</strong></div>
+          <div class="sub">배송비: 5만원 이상 무료, 미만 3,000원</div>
+        </div>
+
+        <form class="form" id="checkout">
+          <h3 style="margin: 12px 0 0;">주문 정보</h3>
+          <div class="two">
+            <input class="input" id="name" placeholder="이름" required />
+            <input class="input" id="phone" placeholder="연락처 (예: 010-1234-5678)" required />
+          </div>
+          <input class="input" id="address" placeholder="주소" required />
+          <select id="pay" class="input" required>
+            <option value="">결제수단 선택</option>
+            <option>카드 결제(데모)</option>
+            <option>무통장 입금(데모)</option>
+          </select>
+          <button class="btn primary" type="button" onclick="placeOrder()">주문하기(데모)</button>
+          <div class="sub" id="orderMsg"></div>
+        </form>
+      </aside>
+    </div>
+
+    <footer>
+      © <span id="year"></span> PC STORE Demo. HTML/CSS/JS 단일 파일 예시.
+    </footer>
+  </main>
+
+  <script>
+    const KRW = new Intl.NumberFormat('ko-KR');
+    const products = [
+      {
+        id: "D-001", cat:"desktop", name:"게이밍 데스크탑 Pro",
+        badge:"BEST", price: 1890000,
+        spec:"Ryzen 7 / 32GB RAM / RTX 4070 / SSD 1TB\nQHD 게이밍 추천"
+      },
+      {
+        id: "D-002", cat:"desktop", name:"사무용 데스크탑 Slim",
+        badge:"가성비", price: 690000,
+        spec:"i5 / 16GB RAM / 내장그래픽 / SSD 512GB\n문서·화상회의 최적"
+      },
+      {
+        id: "L-001", cat:"laptop", name:"울트라북 Air 14",
+        badge:"NEW", price: 1290000,
+        spec:"14\" / i7 / 16GB / SSD 1TB\n1.2kg 경량, 배터리 오래감"
+      },
+      {
+        id: "L-002", cat:"laptop", name:"게이밍 노트북 16 RTX",
+        badge:"HOT", price: 2190000,
+        spec:"16\" 165Hz / i7 / 32GB / RTX 4060\n고주사율 & 휴대형 게이밍"
+      },
+      {
+        id: "P-001", cat:"parts", name:"NVMe SSD 1TB",
+        badge:"추천", price: 99000,
+        spec:"PCIe 4.0 / 읽기 7,000MB/s급\n체감 속도 업그레이드"
+      },
+      {
+        id: "P-002", cat:"parts", name:"RAM 32GB (16x2)",
+        badge:"인기", price: 129000,
+        spec:"DDR5 / 듀얼채널\n멀티태스킹·작업용 추천"
+      },
+    ];
+
+    // cart: { [id]: qty }
+    let cart = JSON.parse(localStorage.getItem("pcstore_cart") || "{}");
+    let appliedCoupon = localStorage.getItem("pcstore_coupon") || "";
+
+    const el = (id) => document.getElementById(id);
+
+    function save(){
+      localStorage.setItem("pcstore_cart", JSON.stringify(cart));
+      localStorage.setItem("pcstore_coupon", appliedCoupon || "");
+    }
+
+    function formatWon(n){ return KRW.format(n) + "원"; }
+
+    function cartCount(){
+      return Object.values(cart).reduce((a,b)=>a+b,0);
+    }
+
+    function subtotal(){
+      let s = 0;
+      for(const [id, qty] of Object.entries(cart)){
+        const p = products.find(x=>x.id===id);
+        if(p) s += p.price * qty;
+      }
+      return s;
+    }
+
+    function discountAmount(sub){
+      // 쿠폰: WELCOME10 => 10% (최대 200,000원)
+      if((appliedCoupon||"").toUpperCase() === "WELCOME10"){
+        return Math.min(Math.floor(sub * 0.10), 200000);
+      }
+      return 0;
+    }
+
+    function shippingFee(afterDiscount){
+      // 5만원 이상 무료, 미만 3000원 (장바구니 비어있으면 0)
+      if(afterDiscount <= 0) return 0;
+      return afterDiscount >= 50000 ? 0 : 3000;
+    }
+
+    function totals(){
+      const sub = subtotal();
+      const dis = discountAmount(sub);
+      const after = Math.max(0, sub - dis);
+      const ship = shippingFee(after);
+      const total = after + ship;
+      return { sub, dis, ship, total };
+    }
+
+    function addToCart(id){
+      cart[id] = (cart[id] || 0) + 1;
+      save();
+      renderCart();
+      renderHeaderCount();
+    }
+
+    function setQty(id, qty){
+      if(qty <= 0) delete cart[id];
+      else cart[id] = qty;
+      save();
+      renderCart();
+      renderHeaderCount();
+    }
+
+    function clearCart(){
+      cart = {};
+      save();
+      renderCart();
+      renderHeaderCount();
+      el("orderMsg").textContent = "";
+    }
+
+    function seedCart(){
+      cart = { "D-002": 1, "P-001": 1, "P-002": 1 };
+      save();
+      renderCart();
+      renderHeaderCount();
+    }
+
+    function applyCoupon(){
+      const code = el("coupon").value.trim().toUpperCase();
+      appliedCoupon = code;
+      save();
+
+      const msg = el("couponMsg");
+      if(!code){
+        msg.textContent = "쿠폰이 해제되었습니다.";
+        msg.style.color = "rgba(233,238,252,.65)";
+      } else if(code === "WELCOME10"){
+        msg.textContent = "WELCOME10 적용 완료: 10% 할인 (최대 200,000원)";
+        msg.style.color = "#caffea";
+      } else {
+        msg.textContent = "유효하지 않은 쿠폰 코드입니다.";
+        msg.style.color = "#ffd6d6";
+      }
+      renderCart();
+    }
+
+    function renderHeaderCount(){
+      el("cartCount").textContent = cartCount();
+    }
+
+    function renderProducts(){
+      const q = el("q").value.trim().toLowerCase();
+      const cat = el("cat").value;
+      const sort = el("sort").value;
+
+      let list = [...products];
+
+      if(cat !== "all") list = list.filter(p => p.cat === cat);
+      if(q){
+        list = list.filter(p =>
+          (p.name + " " + p.spec + " " + p.badge).toLowerCase().includes(q)
+        );
+      }
+
+      if(sort === "low") list.sort((a,b)=>a.price-b.price);
+      if(sort === "high") list.sort((a,b)=>b.price-a.price);
+
+      const grid = el("grid");
+      grid.innerHTML = "";
+      for(const p of list){
+        const card = document.createElement("div");
+        card.className = "card product";
+        card.innerHTML = `
+          <div class="thumb">${p.id}</div>
+          <div class="row">
+            <span class="badge">${p.badge}</span>
+            <span class="sub">${p.cat === "desktop" ? "데스크탑" : p.cat === "laptop" ? "노트북" : "부품"}</span>
+          </div>
+          <h3 class="pname">${p.name}</h3>
+          <p class="spec">${p.spec.replaceAll("\n","<br/>")}</p>
+          <div class="row">
+            <div>
+              <div class="price">${formatWon(p.price)}</div>
+              <div class="sub">부가세 포함 · 단순 예시</div>
+            </div>
+            <button class="btn primary" onclick="addToCart('${p.id}')">장바구니 담기</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    function renderCart(){
+      const list = el("cartList");
+      list.innerHTML = "";
+
+      const entries = Object.entries(cart);
+      if(entries.length === 0){
+        const empty = document.createElement("div");
+        empty.className = "sub";
+        empty.style.marginTop = "10px";
+        empty.textContent = "장바구니가 비어있습니다. 상품을 담아보세요.";
+        list.appendChild(empty);
+      } else {
+        for(const [id, qty] of entries){
+          const p = products.find(x=>x.id===id);
+          if(!p) continue;
+
+          const item = document.createElement("div");
+          item.className = "item";
+          item.innerHTML = `
+            <div class="mini">${id.split("-")[0]}</div>
+            <div class="meta">
+              <p class="t">${p.name}</p>
+              <p class="d">${formatWon(p.price)} · ${id}</p>
+              <div class="qty">
+                <button type="button" aria-label="감소" onclick="setQty('${id}', ${qty-1})">−</button>
+                <span>${qty}</span>
+                <button type="button" aria-label="증가" onclick="setQty('${id}', ${qty+1})">+</button>
+                <button type="button" class="btn" style="padding:6px 10px; border-radius:12px; margin-left:auto;"
+                  onclick="setQty('${id}', 0)">삭제</button>
+              </div>
+            </div>
+          `;
+          list.appendChild(item);
+        }
+      }
+
+      const { sub, dis, ship, total } = totals();
+      el("sumSubtotal").textContent = formatWon(sub);
+      el("sumDiscount").textContent = "-" + formatWon(dis);
+      el("sumShipping").textContent = ship === 0 ? "무료" : formatWon(ship);
+      el("sumTotal").textContent = formatWon(total);
+
+      // coupon input sync
+      el("coupon").value = appliedCoupon || "";
+    }
+
+    function placeOrder(){
+      const msg = el("orderMsg");
+      msg.style.color = "rgba(233,238,252,.75)";
+      msg.textContent = "";
+
+      const { total } = totals();
+      if(cartCount() === 0){
+        msg.style.color = "#ffd6d6";
+        msg.textContent = "장바구니가 비어있습니다.";
+        return;
+      }
+      const name = el("name").value.trim();
+      const phone = el("phone").value.trim();
+      const address = el("address").value.trim();
+      const pay = el("pay").value;
+
+      if(!name || !phone || !address || !pay){
+        msg.style.color = "#ffd6d6";
+        msg.textContent = "주문 정보를 모두 입력해 주세요.";
+        return;
+      }
+
+      // 데모 주문번호
+      const orderNo = "OD" + Date.now().toString().slice(-8);
+      msg.style.color = "#caffea";
+      msg.textContent = `주문 접수(데모) 완료! 주문번호: ${orderNo} · 결제금액: ${formatWon(total)} (실제 결제는 연동되지 않습니다)`;
+
+      // 원하면 주문 후 장바구니 비우기:
+      // clearCart();
+    }
+
+    // events
+    el("q").addEventListener("input", renderProducts);
+    el("cat").addEventListener("change", renderProducts);
+    el("sort").addEventListener("change", renderProducts);
+
+    // init
+    el("year").textContent = new Date().getFullYear();
+    renderProducts();
+    renderCart();
+    renderHeaderCount();
+
+    // coupon message init
+    if(appliedCoupon){
+      el("couponMsg").textContent = (appliedCoupon.toUpperCase() === "WELCOME10")
+        ? "WELCOME10 적용 중"
+        : "유효하지 않은 쿠폰 코드가 저장되어 있습니다.";
+      el("couponMsg").style.color = (appliedCoupon.toUpperCase() === "WELCOME10") ? "#caffea" : "#ffd6d6";
+    }
+  </script>
+</body>
+</html>
