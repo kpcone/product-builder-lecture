@@ -5,24 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로또 번호 추첨기</title>
     <style>
+        :root {
+            --bg: #f0f0f0;
+            --container-bg: white;
+            --text: #333;
+            --shadow: rgba(0,0,0,0.1);
+        }
+        body.dark-mode {
+            --bg: #1a1a1a;
+            --container-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --shadow: rgba(0,0,0,0.5);
+        }
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
-            background-color: white;
+            background-color: var(--container-bg);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px var(--shadow);
             text-align: center;
+            position: relative;
         }
         h1 {
-            color: #333;
+            color: var(--text);
         }
         button {
             background-color: #4CAF50;
@@ -36,6 +51,18 @@
         }
         button:hover {
             background-color: #45a049;
+        }
+        #themeToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: 1px solid #ccc;
+            padding: 5px 8px;
+            margin: 0;
+            cursor: pointer;
+            color: var(--text);
+            border-radius: 5px;
         }
         .numbers {
             margin-top: 20px;
@@ -56,6 +83,7 @@
 </head>
 <body>
     <div class="container">
+        <button id="themeToggle" onclick="toggleTheme()">🌙</button>
         <h1>로또 번호 추첨기</h1>
         <p>버튼을 클릭하여 6개의 로또 번호를 추첨하세요!</p>
         <button onclick="generateNumbers()">번호 추첨</button>
@@ -63,6 +91,20 @@
     </div>
 
     <script>
+        // Theme logic
+        const currentTheme = localStorage.getItem("lotto_theme") || "light";
+        if(currentTheme === "dark") {
+            document.body.classList.add("dark-mode");
+            document.getElementById("themeToggle").textContent = "☀️";
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            document.getElementById("themeToggle").textContent = isDark ? "☀️" : "🌙";
+            localStorage.setItem("lotto_theme", isDark ? "dark" : "light");
+        }
+
         function generateNumbers() {
             const numbers = [];
             while (numbers.length < 6) {

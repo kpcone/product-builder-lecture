@@ -14,13 +14,23 @@
       --radius: 16px;
       --max: 1120px;
     }
+    body.light-mode {
+      --bg:#f8fafc; --panel:#ffffff; --panel2:#f1f5f9;
+      --text:#0f172a; --muted:#475569;
+      --border: rgba(0,0,0,.08);
+      --shadow: 0 10px 25px rgba(0,0,0,.05);
+    }
     *{ box-sizing:border-box; }
     body{
       margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(106,167,255,.25), transparent 50%),
-                  radial-gradient(900px 500px at 90% 0%, rgba(124,255,193,.18), transparent 55%),
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(106,167,255,.15), transparent 50%),
+                  radial-gradient(900px 500px at 90% 0%, rgba(124,255,193,.12), transparent 55%),
                   var(--bg);
       color:var(--text);
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-mode header{
+      background: linear-gradient(to bottom, rgba(255,255,255,.85), rgba(255,255,255,.55));
     }
     a{ color:inherit; text-decoration:none; }
     .container{ max-width:var(--max); margin:0 auto; padding: 24px; }
@@ -266,8 +276,13 @@
         <a href="#cart">장바구니</a>
         <a href="#checkout">주문</a>
       </nav>
-      <div class="pill" title="장바구니">
-        담은 상품 <strong id="cartCount">0</strong>개
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn" id="themeToggle" style="padding: 8px 12px; border-radius: 999px;" title="테마 변경">
+          🌙
+        </button>
+        <div class="pill" title="장바구니">
+          담은 상품 <strong id="cartCount">0</strong>개
+        </div>
       </div>
     </div>
   </header>
@@ -617,6 +632,22 @@
       // 원하면 주문 후 장바구니 비우기:
       // clearCart();
     }
+
+    // theme toggle
+    const themeBtn = el("themeToggle");
+    const currentTheme = localStorage.getItem("pcstore_theme") || "dark";
+    
+    if(currentTheme === "light"){
+      document.body.classList.add("light-mode");
+      themeBtn.textContent = "☀️";
+    }
+
+    themeBtn.addEventListener("click", () => {
+      document.body.classList.toggle("light-mode");
+      const isLight = document.body.classList.contains("light-mode");
+      themeBtn.textContent = isLight ? "☀️" : "🌙";
+      localStorage.setItem("pcstore_theme", isLight ? "light" : "dark");
+    });
 
     // events
     el("q").addEventListener("input", renderProducts);
